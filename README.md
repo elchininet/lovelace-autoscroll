@@ -4,6 +4,10 @@
 
 Force automatic scrolling to the top of the page when navigating through subviews in Home Assistant.
 
+<p align="center">
+    <img src="https://github.com/elchininet/lovelace-autoscroll/blob/master/lovelace-autoscroll.gif?raw=true" width="447" height="800" title="lovelace-autoscroll" />
+</p>
+
 When one clicks on the top menu items, the page is automatically scrolled to the top. This is not the case when one navigates to a subview, the scroll is maintained in the same position in which it was in the previous view. This plugin changes this behaviour, every time that one navigates to a subview, if the scroll of the page is not at the top, it scrolls the page until it reaches the top position. 
 
 ## Installation
