@@ -6,7 +6,7 @@ Lets you decide which views will have automatic scrolling to the top of the page
 
 > Note: by default, the first time that one goes to a view, the scroll position will be placed automatically on the top, this is the default behaviour and doesn‘t have anything to do with this plugin.
 
-| Autoscroll off | Autscroll on |
+| Autoscroll off | Autoscroll on |
 | -------------- | ------------ |
 | <img src="https://github.com/elchininet/lovelace-autoscroll/blob/master/images/autoscroll-off.gif?raw=true" width="100%" title="lovelace-autoscroll" /> | <img src="https://github.com/elchininet/lovelace-autoscroll/blob/master/images/autoscroll-on.gif?raw=true" width="100%" title="lovelace-autoscroll" /> |
 
