@@ -23,14 +23,9 @@ export const getDashboardConfig = (lovelacePanel: LovelacePanel): Promise<Config
     });
 };
 
-export const hasUrlParam = (param: string): boolean => {
+export const getUrlParam = <T extends string>(param: string): T => {
     const params = new URLSearchParams(window.location.search);
-    return params.has(param);
-};
-
-export const getUrlParam = (param: string): string => {
-    const params = new URLSearchParams(window.location.search);
-    return params.get(param);
+    return params.get(param) as T;
 };
 
 export const getViewsObject = (views: View[]): Record<string, View> => {

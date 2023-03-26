@@ -9,6 +9,5 @@ export enum ELEMENT {
 }
 
 export enum PARAM {
-    DISABLE_AUTOSCROLL = 'disable_autoscroll',
     AUTOSCROLL = 'autoscroll'
 }
