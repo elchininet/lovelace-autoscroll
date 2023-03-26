@@ -1,16 +1,24 @@
+export enum PARAM_VALUE {
+    SMOOTH = 'smooth',
+    INSTANT = 'instant',
+    DISABLED = 'disabled'
+}
+
+export type ScrollBehaviourValue = `${PARAM_VALUE}`;
+
 export interface SubviewAutoscrollRunner {
     run: (lovelace: HTMLElement) => void;
     views: Record<string, View>;
-    globalAutoscroll?: ScrollBehavior;
+    globalAutoscroll?: ScrollBehaviourValue;
 }
 
 export interface View {
     path: string;
-    autoscroll?: ScrollBehavior;
+    autoscroll?: ScrollBehaviourValue;
 }
 
 export interface Config {
-    autoscroll?: ScrollBehavior;
+    autoscroll?: ScrollBehaviourValue;
     views: View[];
 }
 
