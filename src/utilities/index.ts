@@ -15,12 +15,17 @@ export const getDashboardConfig = (lovelacePanel: LovelacePanel): Promise<Config
                 if (ATTEMPT_COUNT === 100) {
                     reject('Cannot get Lovelace configuration');
                 } else {
-                    window.setTimeout(getConfig, 250);
+                    window.setTimeout(getConfig, 10);
                 }
             }
         };
         getConfig();
     });
+};
+
+export const hasUrlParam = (param: string): boolean => {
+    const params = new URLSearchParams(window.location.search);
+    return params.has(param);
 };
 
 export const getUrlParam = <T extends string>(param: string): T => {

@@ -1,17 +1,20 @@
 import {
     Config,
+    AutoscrollConfig,
     SubviewAutoscrollRunner,
     View,
     LovelacePanel,
-    ScrollBehaviourValue,
-    PARAM_VALUE
+    AutoscrollParamValue,
+    AUTOSCROLL_PARAM_VALUE
 } from '@types';
 import {
     ELEMENT,
-    PARAM
+    PARAM,
+    SCROLL_DELAY
 } from '@constants';
 import {
     getDashboardConfig,
+    hasUrlParam,
     getUrlParam,
     getViewsObject
 } from '@utilities';
@@ -20,12 +23,30 @@ import { ConsoleInfo } from './console-info';
 class SubviewAutoscroll implements SubviewAutoscrollRunner {
     constructor() {
 
+        this.popstate = false;
         this.ha = document.querySelector(ELEMENT.HOME_ASSISTANT);
         this.main = this.ha.shadowRoot.querySelector(ELEMENT.HOME_ASSISTANT_MAIN).shadowRoot;
 
         this.dashboardObserve = new MutationObserver(this.watchDashboards);
         this.dashboardObserve.observe(this.main.querySelector(ELEMENT.PARTIAL_PANEL_RESOLVER), {
             childList: true,
+        });
+
+        window.history.pushState = new Proxy(window.history.pushState, {
+            apply: (target, thisArg, argArray) => {
+                const currentState = window.history.state;
+                const currentPathName = window.location.pathname; 
+                const scrollTop = document.documentElement.scrollTop;                
+                const newState = currentState
+                    ? { ...currentState, scrollTop }
+                    : { scrollTop };
+                history.replaceState(newState, '', currentPathName);
+                return target.apply(thisArg, argArray);
+            },
+          });
+
+        window.addEventListener('popstate', (): void => {
+            this.popstate = true;
         });
 
         this.run();
@@ -40,11 +61,13 @@ class SubviewAutoscroll implements SubviewAutoscrollRunner {
     private huiViewObserver: MutationObserver;
 
     public views: Record<string, View>;
-    public globalAutoscroll: ScrollBehaviourValue | null;
+    public dashboardConfig: AutoscrollConfig | null;
+    public popstate: boolean;
 
     public run(lovelacePanel = this.main.querySelector<LovelacePanel>(ELEMENT.HA_PANEL_LOVELACE)) {
 
-        this.globalAutoscroll = null;
+        this.dashboardConfig = null;
+
         if (this.huiViewObserver) {
             this.huiViewObserver.disconnect();
         }
@@ -57,14 +80,13 @@ class SubviewAutoscroll implements SubviewAutoscrollRunner {
 
         getDashboardConfig(this.lovelacePanel)
             .then((config: Config) => {
-                this.globalAutoscroll = config.autoscroll || null;
+                this.dashboardConfig = config.autoscroll || null;
                 this.views = getViewsObject(config.views);
                 this.huiRoot = this.lovelacePanel.shadowRoot.querySelector(ELEMENT.HUI_ROOT).shadowRoot;
                 this.huiViewObserver = new MutationObserver(this.watchHuiView);
                 this.huiViewObserver.observe(this.huiRoot.querySelector(ELEMENT.VIEW), {
                     childList: true,
                 });
-                
             })
             .catch((error: Error) => {
                 console.warn(error);
@@ -87,38 +109,62 @@ class SubviewAutoscroll implements SubviewAutoscrollRunner {
             addedNodes.forEach((node: Element): void => {
                 if (node.localName === ELEMENT.HUI_VIEW) {
                     const pathname = window.location.pathname;
-                    const param = getUrlParam<ScrollBehaviourValue>(PARAM.AUTOSCROLL);
+                    const autoscrollParam = getUrlParam<AutoscrollParamValue>(PARAM.AUTOSCROLL);
                     if (
                         pathname &&
-                        document.documentElement.scrollTop > 0 &&
                         (
-                            !param ||
-                            param !== PARAM_VALUE.DISABLED
+                            !autoscrollParam ||
+                            autoscrollParam !== AUTOSCROLL_PARAM_VALUE.DISABLED
                         )
                     ) {
 
+                        const historyKeepScrollParam = hasUrlParam(PARAM.HISTORY_KEEP_SCROLL);
                         const view = pathname.replace(/^.*\/(\w+)$/, '$1');
                         const views = window.SubviewAutoscroll.views;
-                        const autoscroll = (
-                            param ||
-                            views[view]?.autoscroll ||
-                            window.SubviewAutoscroll.globalAutoscroll
+                        const behavior = (
+                            autoscrollParam ||
+                            views[view]?.autoscroll?.behavior ||
+                            window.SubviewAutoscroll?.dashboardConfig?.behavior
                         );
 
-                        if (autoscroll) {
-                            window.setTimeout(() => {
-                                if (autoscroll === PARAM_VALUE.SMOOTH) {
+                        if (
+                            behavior &&
+                            behavior !== AUTOSCROLL_PARAM_VALUE.DISABLED
+                        ) {
+                            const history_keep_scroll = (
+                                historyKeepScrollParam ||
+                                views[view]?.autoscroll?.history_keep_scroll ||
+                                window.SubviewAutoscroll?.dashboardConfig?.history_keep_scroll
+                            );
+
+                            if (window.SubviewAutoscroll.popstate) {
+
+                                if (
+                                    history_keep_scroll &&
+                                    window.history.state?.scrollTop &&
+                                    window.history.state.scrollTop !== document.documentElement.scrollTop
+                                ) {
                                     window.scrollTo({
-                                        top: 0,
-                                        behavior: PARAM_VALUE.SMOOTH
+                                        top: window.history.state.scrollTop
                                     });
-                                } else {
-                                    window.scrollTo({
-                                        top: 0
-                                    });
-                                }                                
-                            }, 5);
+                                }
+
+                            } else {
+                                window.setTimeout(() => {
+                                    if (behavior === AUTOSCROLL_PARAM_VALUE.SMOOTH) {
+                                        window.scrollTo({
+                                            top: 0,
+                                            behavior: AUTOSCROLL_PARAM_VALUE.SMOOTH
+                                        });
+                                    } else {
+                                        window.scrollTo({
+                                            top: 0
+                                        });
+                                    }                                
+                                }, SCROLL_DELAY);
+                            }
                         }
+                        window.SubviewAutoscroll.popstate = false;
                     }                    
                 }
             });

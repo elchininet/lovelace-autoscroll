@@ -2,15 +2,13 @@
 
 [![hacs_badge](https://img.shields.io/badge/HACS-Default-41BDF5.svg)](https://github.com/hacs/integration)
 
-Lets you decide which views will have automatic scrolling to the top of the page while navigating in Home Assistant.
+Better management of the the scroll position of the Lovelace views while navigating in Home Assistant.
 
-> Note: by default, the first time that one goes to a view, the scroll position will be placed automatically on the top, this is the default behaviour and doesn‘t have anything to do with this plugin.
-
-| Autoscroll off | Autoscroll on |
-| -------------- | ------------ |
+| Default behaviour | Autoscroll on |
+| ----------------- | ------------- |
 | <img src="https://github.com/elchininet/lovelace-autoscroll/blob/master/images/autoscroll-off.gif?raw=true" width="100%" title="lovelace-autoscroll" /> | <img src="https://github.com/elchininet/lovelace-autoscroll/blob/master/images/autoscroll-on.gif?raw=true" width="100%" title="lovelace-autoscroll" /> |
 
-When one navigates from one view to another in Home Assistant, sometimes the new page keeps the same scroll position from the previous page (specially subviews). This plugin changes this behaviour, it allows one to configure which views or subviews will automatically scroll to the top of the page when they are rendered.
+When one navigates from one view to another in Home Assistant, sometimes the new page keeps the same scroll position from the previous page (specially subviews). This plugin changes this behaviour, it allows one to configure which views or subviews will automatically scroll to the top of the page when they are rendered and it also allows one to keep scroll position that a page had when navigating back through the history.
 
 ## Installation
 
@@ -48,11 +46,12 @@ You can place the configuration in multiple places, mainly in URL parameters or 
 
 #### Configuration through URL parameters
 
-| URL parameter          | Description                                                     |
-| ---------------------- | --------------------------------------------------------------- |
-| `?autoscroll=smooth`   | Scrolls to the top of the view/subview with `smooth` behaviour  |
-| `?autoscroll=instant`  | Scrolls to the top of the view/subview with `instant` behaviour |
-| `?autoscroll=disabled` | Avoids automatic scrolling overriding any configuration placed in the `yaml` configuration |
+| <div style="width:160px">URL parameter</div>          | Description                                                                                  |
+| ---------------------- | -------------------------------------------------------------------------------------------- |
+| `?autoscroll=smooth`   | Scrolls to the top of the view/subview with `smooth` behaviour when navigating to it         |
+| `?autoscroll=instant`  | Scrolls to the top of the view/subview with `instant` behaviour when navigating to it        |
+| `?autoscroll=disabled` | Disables automatic scrolling overriding any configuration placed in the `yaml` configuration |
+| `&history_keep_scroll` | If `autoscroll` is not `disabled`, it keeps the previous scroll of a page when navigating back to it through the history |
 
 #### Configuration through `yaml`
 
@@ -65,7 +64,9 @@ You can place the configuration in the whole dashboard (all the views in that da
 You need to place the configuration at the begining of the `yaml` file:
 
 ```yaml
-autoscroll: smooth ## <--- here
+autoscroll: ## <--- here
+  behavior: smooth
+  history_keep_scroll: true
 title: Dashboard title
 views:
   ...
@@ -83,15 +84,16 @@ views:
     title: title of the view
     path: path of the view
     badges: []
-    autoscroll: smooth ## <--- here
+    autoscroll: ## <--- here
+      behavior: smooth
+      history_keep_scroll: true
     cards:
       ...
 ```
 
-| Config                 | Description                                                     | 
-| ---------------------- | --------------------------------------------------------------- |
-| `autoscroll: smooth`   | Scrolls to the top of the view/subview with `smooth` behaviour  |
-| `autoscroll: instant`  | Scrolls to the top of the view/subview with `instant` behaviour |
-| `autoscroll: disabled`\* | Avoids automatic scrolling overriding any configuration placed in the dashboard configuration |
-
-\* This configuration is only taken into account in a specific view/subview
+| <div style="width:160px">Config</div>         | Description                                                                                   | 
+| ------------------------------ | --------------------------------------------------------------------------------------------- |
+| `behavior: smooth`             | Scrolls to the top of the view/subview with `smooth` behaviour when navigating to it          |
+| `behavior: instant`    | Scrolls to the top of the view/subview with `instant` behaviour when navigating to it         |
+| `behavior: disabled`   | Avoids automatic scrolling overriding any configuration placed in the dashboard configuration |
+| `history_keep_scroll`  | If the `behavior` is not `disabled` and this parameter is `true`, it keeps the previous scroll of a page when navigating back to it through the history |
