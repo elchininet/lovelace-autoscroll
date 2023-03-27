@@ -9,5 +9,8 @@ export enum ELEMENT {
 }
 
 export enum PARAM {
-    AUTOSCROLL = 'autoscroll'
+    AUTOSCROLL = 'autoscroll',
+    HISTORY_KEEP_SCROLL = 'history_keep_scroll'
 }
+
+export const SCROLL_DELAY = 0;
