@@ -13,6 +13,7 @@ export interface AutoscrollConfig {
 
 export interface SubviewAutoscrollRunner {
     run: (lovelace: HTMLElement) => void;
+    autoscroll: () => void;
     views: Record<string, View>;
     dashboardConfig?: AutoscrollConfig;
     popstate: boolean;

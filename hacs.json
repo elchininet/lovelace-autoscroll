@@ -1,5 +1,6 @@
 {
     "name": "Autoscroll",
     "filename": "autoscroll.js",
-    "render_readme": true
+    "render_readme": true,
+    "homeassistant": "2023.4"
   }
