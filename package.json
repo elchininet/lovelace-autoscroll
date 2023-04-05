@@ -1,6 +1,6 @@
 {
   "name": "lovelace-subview-autoscroll",
-  "version": "2.2.0",
+  "version": "3.0.0",
   "description": "Automatically scroll to the top of the page when navigating into a subview in Home Assistant",
   "main": "subview-autoscroll.js",
   "repository": "git@github.com:elchininet/lovelace-subview-autoscroll.git",
